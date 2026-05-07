@@ -137,28 +137,84 @@ No **12º traste**, a distância da pestana deve ser **exatamente metade da esca
 
 ## Infraestrutura de Execução
 
-> _Preencher conforme definição do grupo (ex: Leiningen, Docker, etc.)_
+| Camada | Tecnologia |
+|--------|-----------|
+| Gerenciador de dependências | Clojure CLI + `deps.edn` |
+| Servidor HTTP | http-kit 2.8.0 |
+| Roteamento | Compojure 1.7.1 |
+| Middleware | Ring Core 1.12.2 |
+| Serialização JSON | Cheshire 5.13.0 |
+| Ambiente de dev | VS Code + Calva (nREPL) |
+| Ambiente de deploy | localhost / AWS ou Integrator |
 
 ---
 
 ## Configuração do Ambiente
 
-> _Preencher com instruções de instalação e execução_
+### Requisitos
+
+- [Clojure CLI](https://clojure.org/guides/install_clojure) instalado (`clj` disponível no terminal)
+- Java 11+ instalado
+
+### Instalação
 
 ```bash
-# Exemplo
-lein run
+# Clone o repositório
+git clone https://github.com/kauamarcatto/jose-valderrama.git
+cd jose-valderrama
+
+# Baixe as dependências e inicie o servidor
+clj -M:run
+```
+
+O servidor iniciará em `http://localhost:3000`.
+
+### Testes
+
+```bash
+clj -M:test
 ```
 
 ---
 
 ## Endpoints — API
 
-| Método | Endpoint | Descrição |
-|--------|----------|-----------|
-| `GET` | `/trastes?escala=650` | Retorna posição de todos os trastes para a escala informada |
+### `GET /trastes`
 
-> _Detalhar os endpoints conforme implementação_
+Retorna a posição de todos os trastes para a escala e número de trastes informados.
+
+**Parâmetros (query string):**
+
+| Parâmetro | Tipo | Padrão | Descrição |
+|-----------|------|--------|-----------|
+| `escala` | `double` | `650` | Comprimento da escala em mm |
+| `num-trastes` | `int` | `24` | Número de trastes do instrumento |
+
+**Exemplo de requisição:**
+```
+GET http://localhost:3000/trastes?escala=650&num-trastes=24
+```
+
+**Exemplo de resposta:**
+```json
+{
+  "escala": 650.0,
+  "num-trastes": 24,
+  "trastes": [
+    { "traste": 1,  "distancia-pestana": 36.48,  "distancia-ponte": 613.52 },
+    { "traste": 2,  "distancia-pestana": 70.94,  "distancia-ponte": 579.06 },
+    { "traste": 12, "distancia-pestana": 325.0,  "distancia-ponte": 325.0  },
+    { "traste": 24, "distancia-pestana": 487.5,  "distancia-ponte": 162.5  }
+  ]
+}
+```
+
+**Erros:**
+
+| Status | Situação |
+|--------|----------|
+| `400` | `escala` ou `num-trastes` com valor zero ou negativo |
+| `404` | Rota não encontrada |
 
 ---
 
@@ -184,8 +240,8 @@ lein run
   - [x] Fluxo operacional
   - [x] Funcionalidades principais
   - [x] Tecnologias utilizadas
-  - [ ] Infraestrutura de execução
-  - [ ] Configuração do ambiente
+  - [x] Infraestrutura de execução
+  - [x] Configuração do ambiente
   - [x] Endpoints — API
   - [x] Futuras melhorias (Roadmap)
   - [ ] Referências
